@@ -1,18 +1,5 @@
 package com.glut.news.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang.time.DateUtils;
-import org.jsoup.helper.DataUtil;
-import org.springframework.stereotype.Service;
-
 import com.glut.news.mapper.HistoryMapper;
 import com.glut.news.mapper.UserMapper;
 import com.glut.news.mapper.VideoMapper;
@@ -22,6 +9,11 @@ import com.glut.news.vo.Page;
 import com.glut.news.vo.UserInfo;
 import com.glut.news.vo.Video;
 import com.google.gson.Gson;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.*;
 
 @Service
 public class VideoServiceImpl implements IVideoService {
@@ -148,5 +140,10 @@ public class VideoServiceImpl implements IVideoService {
 
 		
 		return video2;
+	}
+
+	@Override
+	public void deleteRepeatVideoServer() {
+		videoMapper.deleteRepeatVideo();
 	}
 }

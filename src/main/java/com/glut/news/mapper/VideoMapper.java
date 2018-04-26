@@ -1,9 +1,9 @@
 package com.glut.news.mapper;
 
-import java.util.List;
-
 import com.glut.news.vo.Page;
 import com.glut.news.vo.Video;
+
+import java.util.List;
 
 public interface VideoMapper {
 
@@ -17,5 +17,6 @@ public interface VideoMapper {
 	Video selectById(Video v);
 	List<Video> selectByKeyWords(Page<Video> page);
 	int selectByKeywordsTatol(Video video);
+	void deleteRepeatVideo();
 	
 }

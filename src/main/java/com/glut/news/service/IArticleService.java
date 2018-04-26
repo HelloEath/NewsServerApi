@@ -1,12 +1,10 @@
 package com.glut.news.service;
 
-import java.util.List;
-
-import javax.servlet.http.HttpSession;
-
 import com.glut.news.vo.Article;
 import com.glut.news.vo.Page;
-import com.glut.news.vo.Video;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
 public interface IArticleService {
 
@@ -19,4 +17,5 @@ public interface IArticleService {
 	Article getDetailArticleService(Article article, HttpSession hSession);
 	List<Article> getArticleByKeyWordsSerVice(Page<Article> page);
 
+	void deleteRepeatArticleServer();
 }

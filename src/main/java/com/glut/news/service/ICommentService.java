@@ -1,9 +1,9 @@
 package com.glut.news.service;
 
-import java.util.List;
-
 import com.glut.news.vo.Comments;
 import com.glut.news.vo.Page;
+
+import java.util.List;
 
 public interface ICommentService {
 
@@ -16,5 +16,6 @@ public interface ICommentService {
 	int insertCommentService(Comments comment);
 
 	int updateCommentService(String contentId, int type);
+	void deleteRepeatCommentServer();
 
 }

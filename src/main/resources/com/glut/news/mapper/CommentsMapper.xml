@@ -114,7 +114,7 @@ select count(Comment_Id) from Comments where Comment_Article=#{Comment_Article}
 	where Article_Id=#{Article_Id}
 	</update>
 	
-	<delete id="deleteComment" parameterType="comments">
+	<delete id="deleteRepeatComment" >
 	delete Comments where
  Comment_Id=#{Comment_Id} and Comment_Author=#{Comment_Author}
 	</delete>

@@ -186,7 +186,24 @@ select * from Video where video_id=#{video_Id}
 	where Video_Id=#{Video_Id}
 	</update>
 	
-	<delete id="deleteVideo" parameterType="video">
-	delete Video <trim prefix="where"></trim><if test="Video_Id!=0"> Video_Id=#{Video_Id}</if>
+	<delete id="deleteRepeatVideo" parameterType="video">
+DELETE video
+FROM
+ video,
+ (
+  SELECT
+   min(VIDEO_ID) VIDEO_ID,
+   VIDEO_TITLE
+
+  FROM
+   video
+  GROUP BY
+   VIDEO_TITLE
+  HAVING
+   count(*) > 1
+ ) t2
+WHERE
+ video.VIDEO_TITLE = t2.VIDEO_TITLE
+AND video.VIDEO_ID > t2.VIDEO_ID;
 	</delete>
 	</mapper>

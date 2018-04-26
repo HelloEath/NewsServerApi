@@ -1,24 +1,5 @@
 package com.glut.news.controller;
 
-import java.awt.print.Pageable;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.glut.news.commons.CommonUtil;
 import com.glut.news.service.IArticleService;
 import com.glut.news.service.INetBugsService;
@@ -26,6 +7,17 @@ import com.glut.news.vo.Article;
 import com.glut.news.vo.Page;
 import com.glut.news.vo.UserInfo;
 import com.google.gson.Gson;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/article")
@@ -125,6 +117,8 @@ public class ArticleController {
 				iNetBugsService.bugsZakerWeb();
 				iNetBugsService.bugsFirstNewsWeb();
 				iNetBugsService.bugsTouTiaoWeb();
+				iArticleService.deleteRepeatArticleServer();
+
 				Long endTime=System.currentTimeMillis();
 				System.out.println("爬取结束时间："+endTime);
 			     float excTime=(float)(endTime-starTime)/1000;

@@ -1,11 +1,10 @@
 package com.glut.news.service;
 
-import java.util.List;
-
-import javax.servlet.http.HttpSession;
-
 import com.glut.news.vo.Page;
 import com.glut.news.vo.Video;
+
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
 public interface IVideoService {
 
@@ -31,4 +30,5 @@ public interface IVideoService {
 
 	Video getVideoDetailService(Video video, HttpSession hSession);
 
+	void deleteRepeatVideoServer();
 }

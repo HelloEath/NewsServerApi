@@ -1,39 +1,18 @@
 package com.glut.news.service.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.javassist.expr.NewArray;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.springframework.stereotype.Service;
-
-import com.glut.news.commons.NetUtils;
 import com.glut.news.mapper.ArticleMapper;
 import com.glut.news.mapper.HistoryMapper;
 import com.glut.news.mapper.UserMapper;
 import com.glut.news.service.IArticleService;
 import com.glut.news.service.INetBugsService;
 import com.glut.news.vo.Article;
-import com.glut.news.vo.History;
 import com.glut.news.vo.Page;
-import com.glut.news.vo.UserInfo;
-import com.glut.news.vo.Video;
-import com.google.gson.Gson;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -94,7 +73,12 @@ static List<String> urls=new ArrayList<String>();
 		// TODO Auto-generated method stub
 		return mArticleMapper.selectByKeyWords(page);
 	}
-	
-	
+
+	@Override
+	public void deleteRepeatArticleServer() {
+
+		mArticleMapper.deleteRepeatArticle();
+	}
+
 
 }

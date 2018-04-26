@@ -1,11 +1,5 @@
 package com.glut.news.service.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
 import com.glut.news.mapper.ArticleMapper;
 import com.glut.news.mapper.CommentsMapper;
 import com.glut.news.mapper.VideoMapper;
@@ -14,6 +8,10 @@ import com.glut.news.vo.Article;
 import com.glut.news.vo.Comments;
 import com.glut.news.vo.Page;
 import com.glut.news.vo.Video;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 
@@ -72,5 +70,10 @@ public class CommentServiceImpl implements ICommentService {
 		}
 		return 0;
 	}
-	
+
+	@Override
+	public void deleteRepeatCommentServer() {
+		mCommentMapper.deleteRepeatComment();
+	}
+
 }

@@ -17,4 +17,5 @@ public interface ArticleMapper {
 	int updateArticle(Article a);
 	List<Article> selectByKeyWords(Page<Article> page);
 	List<Article> selectAll();
+	void deleteRepeatArticle();
 }

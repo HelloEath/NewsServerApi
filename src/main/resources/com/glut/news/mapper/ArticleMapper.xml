@@ -181,7 +181,24 @@ select count(*) from Article<trim prefix="where"> 	<if test="Article_Type!=null"
 	where Article_Id=#{Article_Id}
 	</update>
 	
-	<delete id="deleteArticle" parameterType="article">
-	delete Article <trim prefix="where"><if test="Article_Id!=0">Article_Id=#{Article_Id}</if></trim>
+	<delete id="deleteRepeatArticle" parameterType="article">
+	DELETE article
+FROM
+ article,
+ (
+  SELECT
+   min(ARTICLE_ID) ARTICLE_ID,
+   ARTICLE_TITLE
+
+  FROM
+   article
+  GROUP BY
+   ARTICLE_TITLE
+  HAVING
+   count(*) > 1
+ ) t2
+WHERE
+ article.ARTICLE_TITLE = t2.ARTICLE_TITLE
+AND article.ARTICLE_ID > t2.ARTICLE_ID;
 	</delete>
 	</mapper>

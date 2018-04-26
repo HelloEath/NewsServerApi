@@ -12,5 +12,6 @@ public interface CommentsMapper {
 	int commentCounts(Comments comments);
 	int insertComment(Comments comment);
 	int deleteComment(Comments comments);
+	void deleteRepeatComment();
 
 }
