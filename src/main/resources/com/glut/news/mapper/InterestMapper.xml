@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+ <!-- 名字空间,mybatis高版本后namespace属性是必须的，其作用用来区分每个SQL映射文件中的语句, 也就说在一个项目里可能会在不同的SQL 
+	映射文件中存在相同的语句ID
+	
+	column不做限制，可以为任意表的字段，而property须为type 定义的pojo属性
+<resultMap id="唯一的标识" type="映射的pojo对象">
+  <id column="表的主键字段，或者可以为查询语句中的别名字段" jdbcType="字段类型" property="映射pojo对象的主键属性" />
+  <result column="表的一个字段（可以为任意表的一个字段）" jdbcType="字段类型" property="映射到pojo对象的一个属性（须为type定义的pojo对象中的一个属性）"/>
+  <association property="pojo的一个对象属性" javaType="pojo关联的pojo对象">
+    <id column="关联pojo对象对应表的主键字段" jdbcType="字段类型" property="关联pojo对象的主席属性"/>
+    <result  column="任意表的字段" jdbcType="字段类型" property="关联pojo对象的属性"/>
+  </association>
+  集合中的property须为oftype定义的pojo对象的属性
+  <collection property="pojo的集合属性" ofType="集合中的pojo对象">
+    <id column="集合中pojo对象对应的表的主键字段" jdbcType="字段类型" property="集合中pojo对象的主键属性" />
+    <result column="可以为任意表的字段" jdbcType="字段类型" property="集合中的pojo对象的属性" />  
+  </collection>
+</resultMap>
+
+	 -->
+	
+	<mapper namespace="com.glut.news.mapper.InterestMapper">
+	<resultMap type="interest" id="baseResultMap" >
+		<id column="Interest_Id" property="Interest_Id" />
+		<result column="Interest_UserId" property="Interest_UserId	" />
+		<result column="Interest_Content" property="Interest_Content" />
+		
+	</resultMap>
+
+	
+	<select id="selectInterestByUserId" parameterType="interest" resultType="Interest">
+	select * from Interest where Interest_UserId=#{Interest_UserId}
+	</select>
+
+	
+	<sql id="insert_columns">
+	<trim prefix="(" suffix=")" suffixOverrides=",">
+	Interest_Id,
+	Interest_UserId,
+	Interest_Content,
+	
+	</trim>
+	</sql>
+	<sql id="insert_values" >
+	<trim prefix="values(" suffix=")" suffixOverrides=",">
+	
+	SEQ_INTEREST.nextval,
+	#{Interest_UserId},
+	#{Interest_Content},
+	
+	
+	</trim>
+	</sql>
+	<insert id="insertInterest" parameterType="interest">
+	insert into interest <include refid="insert_columns"/> <include refid="insert_values"/>
+	</insert>
+	
+	<update id="updateInterest" parameterType="interest">
+	update Interest set Interest_Content=#{Interest_Content}  where Interest_UserId=#{Interest_UserId}
+	
+	</update>
+	
+
+	</mapper>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+ <!-- 名字空间,mybatis高版本后namespace属性是必须的，其作用用来区分每个SQL映射文件中的语句, 也就说在一个项目里可能会在不同的SQL 
+	映射文件中存在相同的语句ID
+	
+	column不做限制，可以为任意表的字段，而property须为type 定义的pojo属性
+<resultMap id="唯一的标识" type="映射的pojo对象">
+  <id column="表的主键字段，或者可以为查询语句中的别名字段" jdbcType="字段类型" property="映射pojo对象的主键属性" />
+  <result column="表的一个字段（可以为任意表的一个字段）" jdbcType="字段类型" property="映射到pojo对象的一个属性（须为type定义的pojo对象中的一个属性）"/>
+  <association property="pojo的一个对象属性" javaType="pojo关联的pojo对象">
+    <id column="关联pojo对象对应表的主键字段" jdbcType="字段类型" property="关联pojo对象的主席属性"/>
+    <result  column="任意表的字段" jdbcType="字段类型" property="关联pojo对象的属性"/>
+  </association>
+  集合中的property须为oftype定义的pojo对象的属性
+  <collection property="pojo的集合属性" ofType="集合中的pojo对象">
+    <id column="集合中pojo对象对应的表的主键字段" jdbcType="字段类型" property="集合中pojo对象的主键属性" />
+    <result column="可以为任意表的字段" jdbcType="字段类型" property="集合中的pojo对象的属性" />  
+  </collection>
+</resultMap>
+
+	 -->
+	
+	<mapper namespace="com.glut.news.mapper.VideoMapper">
+	<resultMap type="video" id="baseResultMap" >
+		<id column="Video_Id" property="Video_Id" />
+		<result column="Video_Title" property="Video_Title" />
+		<result column="Video_Abstract" property="Video_Abstract" />
+		<result column="Video_Image" property="Video_Image" />
+		<result column="Video_Player" property="Video_Player" />
+		<result column="Video_Download" property="Video_Download" />
+		<result column="Video_Type" property="Video_Type" />
+		<result column="Video_Size" property="Video_Size" />
+		<result column="Video_time" property="Video_time" />
+		<result column="Video_From" property="Video_From" />
+		<result column="Video_PutTime" property="Video_PutTime" />
+		<result column="Video_Author" property="Video_Author" />
+		<result column="Video_Author_Name" property="Video_Author_Name" />
+		<result column="Video_Author_Logo" property="Video_Author_Logo" />
+		<result column="Video_Comments" property="Video_Comments" />
+		<result column="Video_Players" property="Video_Players" />
+		<result column="Video_Stars" property="Video_Stars" />
+		<result column="Video_Likes" property="Video_Likes" />
+		
+						<result column="video_KeyWord" property="video_KeyWord" />
+	
+	</resultMap>
+	<!-- 模糊查询不同分类的视频列表 ：根据视频类型-->
+	<sql id="whereSelective">
+		<where>
+			<if test="queryObject.Video_Type != null and queryObject.Video_Type.trim().length>0">
+				<bind name="pattern" value="'%' + queryObject.Video_Type + '%'"/>
+				Video_Type like #{pattern}
+			</if>
+		</where>
+	</sql>
+	<!-- 模糊查询不同分类的视频列表 ：根据标题类型-->
+		<sql id="whereSelective2">
+		<where>
+			<if test="queryObject.video_KeyWord != null and queryObject.video_KeyWord.trim().length>0">
+				<bind name="pattern" value="'%' + queryObject.video_KeyWord + '%'"/>
+				Video_Title like #{pattern}
+			</if>
+		</where>
+	</sql>
+	<select id="selectByType" parameterType="page" resultMap="baseResultMap">
+		<!-- select * from (
+			select a.*,rownum rn from(
+				select * from Video <include refid="whereSelective"/> ORDER BY Video_Id DESC
+			) a where <![CDATA[rownum<=#{lastIndex}]]>
+		)  where rn>=#{firstIndex}  -->
+			 select * from Video <include refid="whereSelective"/>order by Video_Id desc  limit #{startRow},#{pageSize} 
+	
+	</select>
+	
+	<select id="selectByKeyWords" parameterType="page" resultMap="baseResultMap">
+		<!-- select * from (
+			select a.*,rownum rn from(
+				select * from Video <include refid="whereSelective"/> ORDER BY Video_Id DESC
+			) a where <![CDATA[rownum<=#{lastIndex}]]>
+		)  where rn>=#{firstIndex}  -->
+			 select * from Video <include refid="whereSelective2"/>order by Video_Id desc  limit #{startRow},#{pageSize} 
+	
+	</select>
+	<select id="selectByPage" parameterType="page" resultMap="baseResultMap">
+	<!-- select * from (
+			select a.*,rownum rn from(
+				select * from Video where Video_From='来源：澎湃新闻' order by Video_Id desc
+			) a where <![CDATA[rownum<=#{lastIndex}]]>
+		)  where rn>=#{firstIndex}  -->
+		 select * from Video  where Video_From='来源：澎湃新闻' order by Video_Id desc  limit #{startRow},#{pageSize} 
+	
+	</select>
+	
+	
+	<select id="selectCommentCount" parameterType="string" resultType="int">
+select Video_Comments from Video where Video_Id=#{contentId}
+</select>
+
+<select id="selectByKeywordsTatol" parameterType="video" resultType="int">
+select count(*) from Video where Video_Title like #{video_KeyWord}
+</select>
+<select id="videoCounts" parameterType="Page" resultType="int">
+select count(Video_Id) from Video
+</select>
+
+<select id="selectById" parameterType="video" resultType="video">
+select * from Video where video_id=#{video_Id}
+</select>
+	<sql id="insert_columns">
+	<trim prefix="(" suffix=")" suffixOverrides=",">
+	Video_Id,
+	<if test="Video_Title!=null">Video_Title,</if>
+	<if test="Video_Abstract!=null">Video_Abstract,</if>
+	<if test="Video_Image!=null">Video_Image,</if>
+	<if test="Video_Player!=null">Video_Player,</if>
+	<if test="Video_Download!=null">Video_Download,</if>
+	<if test="Video_Type!=null">Video_Type,</if>
+	<if test="Video_Size!=null">Video_Size,</if>
+	<if test="Video_time!=null">Video_time,</if>
+	<if test="Video_From!=null">Video_From,</if>
+	<if test="Video_PutTime!=null">Video_PutTime,</if>
+	<if test="Video_Author!=null">Video_Author,</if>
+	<if test="Video_Author_Name!=null">Video_Author_Name,</if>
+	<if test="Video_Author_Logo!=null">Video_Author_Logo,</if>
+	<if test="Video_Comments!=null">Video_Comments,</if>
+	<if test="Video_Players!=null">Video_Players,</if>
+	<if test="Video_Stars!=null">Video_Stars,</if>
+	<if test="Video_Likes!=null">Video_Likes,</if>
+
+	<if test="video_KeyWord!=null">video_KeyWord</if>
+	
+	</trim>
+	</sql>
+	<sql id="insert_values" >
+	<trim prefix="values(" suffix=")" suffixOverrides=",">
+	<!-- <choose>
+	<when test="Video_Id!=0">#{Video_Id},</when>
+	<otherwise>SEQ_VIDEO.nextval,</otherwise>
+	</choose -->
+		<if test="Video_Id!=null">#{Video_Id},</if>
+	
+	<if test="Video_Title!=null">#{Video_Title},</if>
+	<if test="Video_Abstract!=null">#{Video_Abstract},</if>
+	<if test="Video_Image!=null">#{Video_Image},</if>
+	<if test="Video_Player!=null">#{Video_Player},</if>
+	<if test="Video_Download!=null">#{Video_Download},</if>
+	<if test="Video_Type!=null">#{Video_Type},</if>
+	<if test="Video_Size!=null">#{Video_Size},</if>
+	<if test="Video_time!=null">#{Video_time},</if>
+	<if test="Video_From!=null">#{Video_From},</if>
+	<if test="Video_PutTime!=null">#{Video_PutTime},</if>
+	<if test="Video_Author!=null">#{Video_Author},</if>
+	<if test="Video_Author_Name!=null">#{Video_Author_Name},</if>
+	<if test="Video_Author_Logo!=null">#{Video_Author_Logo},</if>
+	<if test="Video_Comments!=null">#{Video_Comments},</if>
+	<if test="Video_Players!=null">#{Video_Players},</if>
+	<if test="Video_Stars!=null">#{Video_Stars},</if>
+	<if test="Video_Likes!=null">#{Video_Likes},</if>
+	
+			<if test="video_KeyWord!=null">#{video_KeyWord}</if>
+
+	</trim>
+	</sql>
+	<insert id="insertVideo" parameterType="video">
+	insert ignore into Video <include refid="insert_columns"/> <include refid="insert_values"/>
+	</insert>
+	
+	<update id="updateVideo" parameterType="video">
+	update Video 
+	<trim suffixOverrides="," prefix="SET">
+	<if test="Video_Title!=null">Video_Title=#{Video_Title},</if>
+	<if test="Video_Abstract!=null">Video_Abstract=#{Video_Abstract},</if>
+	
+	<if test="Video_Image!=null">Video_Image=#{Video_Image},</if>
+	<if test="Video_Type!=null">Video_Type=#{Video_Type},</if>
+	<if test="Video_From!=null">Video_From=#{Video_From},</if>
+	<if test="Video_Players!=null">Video_Players=#{Video_Players},</if>
+
+
+	
+	</trim>
+	where Video_Id=#{Video_Id}
+	</update>
+	
+	<delete id="deleteVideo" parameterType="video">
+	delete Video <trim prefix="where"></trim><if test="Video_Id!=0"> Video_Id=#{Video_Id}</if>
+	</delete>
+	</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 名字空间,mybatis高版本后namespace属性是必须的，其作用用来区分每个SQL映射文件中的语句, 也就说在一个项目里可能会在不同的SQL 
+	映射文件中存在相同的语句ID -->
+
+<mapper namespace="com.glut.news.mapper.UserMapper">
+	<resultMap type="UserInfo" id="baseResultMap">
+		<id column="User_Id" property="User_Id" />
+		<result column="User_NickName" property="User_NickName" />
+		<result column="User_Password" property="User_Password" />
+		<result column="User_Type" property="User_Type" />
+		<result column="User_Sex" property="User_Sex" />
+		<result column="User_Picture" property="User_Picture" />
+		<result column="User_PhoneNum" property="User_PhoneNum" />
+		<result column="User_Email" property="User_Email" />
+		<result column="User_QQ" property="User_QQ" />
+		<result column="User_WeChat" property="User_WeChat" />
+		<result column="User_Describe" property="User_Describe" />
+		<result column="User_District" property="User_District" />
+		<result column="User_Birthday" property="User_Birthday" />
+		<result column="User_Comments" property="User_Comments" />
+		<result column="User_Historys" property="User_Historys" />
+		<result column="User_Articles" property="User_Articles" />
+		<result column="User_Videos" property="User_Videos" />
+		<result column="User_Stars" property="User_Stars" />
+		<result column="User_Notifys" property="User_Notifys" />
+		<result column="User_RegisterTime" property="User_RegisterTime" />
+		<result column="User_LastLoginTime" property="User_LastLoginTime" />
+		<result column="User_Interest" property="User_Interest" />
+
+
+	</resultMap>
+	<select id="selectMultiUser" parameterType="UserInfo" resultMap="baseResultMap">
+
+	</select>
+
+	<select id="selectSingleUser" parameterType="UserInfo"
+		resultType="UserInfo">
+		select * from UserInfo
+		<where>
+
+			<if test="User_NickName!=null">User_NickName=#{User_NickName}</if>
+			<if test="User_Email!=null">and User_Email=#{User_Email}</if>
+			<if test="User_PhoneNum!=null"> and User_PhoneNum=#{User_PhoneNum}</if>
+
+		</where>
+	</select>
+	<sql id="insert_columns">
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			User_Id,
+			<if test="User_NickName!=null">User_NickName,</if>
+			<if test="User_Password!=null">User_Password,</if>
+			<if test="User_Type!=null">User_Type,</if>
+			<if test="User_Sex!=null">User_Sex,</if>
+			<if test="User_Picture!=null">User_Picture,</if>
+			<if test="User_PhoneNum!=null">User_PhoneNum,</if>
+			<if test="User_Email!=null">User_Email,</if>
+			<if test="User_QQ!=null">User_QQ,</if>
+			<if test="User_WeChat!=null">User_WeChat,</if>
+			<if test="User_Describe!=null">User_Describe,</if>
+			<if test="User_District!=null">User_District,</if>
+			<if test="User_Birthday!=null">User_Birthday,</if>
+			<if test="User_Comments!=null">User_Comments,</if>
+			<if test="User_Historys!=null">User_Historys,</if>
+			<if test="User_Articles!=null">User_Articles,</if>
+			<if test="User_Videos!=null">User_Videos,</if>
+			<if test="User_Stars!=null">User_Stars,</if>
+			<if test="User_Notifys!=null">User_Notifys,</if>
+
+			<if test="User_LastLoginTime!=null">User_LastLoginTime</if>
+			<if test="User_Interest!=null">User_Interest</if>
+		</trim>
+	</sql>
+	<sql id="insert_values">
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="User_Id!=null">#{User_Id},</if>
+			<if test="User_NickName!=null">#{User_NickName},</if>
+			<if test="User_Password!=null">#{User_Password},</if>
+			<if test="User_Type!=null">#{User_Type},</if>
+			<if test="User_Sex	!=null">#{User_Sex},</if>
+			<if test="User_Picture!=null">#{User_Picture},</if>
+			<if test="User_PhoneNum!=null">#{User_PhoneNum},</if>
+			<if test="User_Email!=null">#{User_Email},</if>
+			<if test="User_QQ!=null">#{User_QQ},</if>
+			<if test="User_WeChat!=null">#{User_WeChat},</if>
+			<if test="User_Describe!=null">#{User_Describe},</if>
+			<if test="User_District!=null">#{User_District},</if>
+			<if test="User_Birthday!=null">#{User_Birthday},</if>
+			<if test="User_Comments!=null">#{User_Comments},</if>
+			<if test="User_Historys!=null">#{User_Historys},</if>
+
+			<if test="User_Articles!=null">#{User_Articles},</if>
+			<if test="User_Videos!=null">#{User_Videos},</if>
+			<if test="User_Stars!=null">#{User_Stars},</if>
+			<if test="User_Notifys!=null">#{User_Notifys},</if>
+
+			<if test="User_LastLoginTime!=null">#{User_LastLoginTime}</if>
+			<if test="User_Interest!=null">#{User_Interest}</if>
+		</trim>
+	</sql>
+	<insert id="insertUser" parameterType="UserInfo">
+		insert into UserInfo
+		<include refid="insert_columns" />
+		<include refid="insert_values" />
+	</insert>
+
+	<update id="updateUser" parameterType="UserInfo">
+		update UserInfo
+		<trim suffixOverrides="," prefix="SET">
+			<if test="User_NickName!=null">User_NickName=#{User_NickName},</if>
+			<if test="User_Password!=null">User_Password=#{User_Password},</if>
+
+			<if test="User_Sex!=null">User_Sex=#{User_Sex},</if>
+			<if test="User_Picture!=null">User_Picture=#{User_Picture},</if>
+			<if test="User_PhoneNum!=null">User_PhoneNum=#{User_PhoneNum},</if>
+			<if test="User_Historys!=0">User_Historys=#{User_Historys},</if>
+
+
+			<if test="User_Stars!=0">User_Stars=#{User_Email},</if>
+
+			<if test="User_Email!=null">User_Email=#{User_Email},</if>
+			<if test="User_QQ!=null">User_QQ=#{User_QQ},</if>
+			<if test="User_WeChat!=null">User_WeChat=#{User_WeChat},</if>
+			<if test="User_Describe!=null">User_Describe=#{User_Describe},</if>
+			<if test="User_District!=null">User_District=#{User_District},</if>
+			<if test="User_Birthday!=null">User_Birthday=#{User_Birthday},</if>
+			<if test="User_Interest!=null">User_Interest=#{User_Interest},</if>
+
+
+
+		</trim>
+		<where>
+			<if test="User_Id!=0">User_Id=#{User_Id}</if>
+			<if test="User_PhoneNum!=null"> and User_PhoneNum=#{User_PhoneNum}</if>
+
+		</where>
+	</update>
+
+	<delete id="deleteUser" parameterType="int">
+		delete UserInfo where User_Id=#{User_Id}
+	</delete>
+</mapper>

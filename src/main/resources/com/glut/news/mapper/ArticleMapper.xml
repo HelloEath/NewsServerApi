@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+ <!-- 名字空间,mybatis高版本后namespace属性是必须的，其作用用来区分每个SQL映射文件中的语句, 也就说在一个项目里可能会在不同的SQL 
+	映射文件中存在相同的语句ID
+	
+	column不做限制，可以为任意表的字段，而property须为type 定义的pojo属性
+<resultMap id="唯一的标识" type="映射的pojo对象">
+  <id column="表的主键字段，或者可以为查询语句中的别名字段" jdbcType="字段类型" property="映射pojo对象的主键属性" />
+  <result column="表的一个字段（可以为任意表的一个字段）" jdbcType="字段类型" property="映射到pojo对象的一个属性（须为type定义的pojo对象中的一个属性）"/>
+  <association property="pojo的一个对象属性" javaType="pojo关联的pojo对象">
+    <id column="关联pojo对象对应表的主键字段" jdbcType="字段类型" property="关联pojo对象的主席属性"/>
+    <result  column="任意表的字段" jdbcType="字段类型" property="关联pojo对象的属性"/>
+  </association>
+  集合中的property须为oftype定义的pojo对象的属性
+  <collection property="pojo的集合属性" ofType="集合中的pojo对象">
+    <id column="集合中pojo对象对应的表的主键字段" jdbcType="字段类型" property="集合中pojo对象的主键属性" />
+    <result column="可以为任意表的字段" jdbcType="字段类型" property="集合中的pojo对象的属性" />  
+  </collection>
+</resultMap>
+
+	 -->
+	
+	<mapper namespace="com.glut.news.mapper.ArticleMapper">
+	<resultMap type="article" id="baseResultMap" >
+		<id column="Article_Id" property="Article_Id" />
+		<result column="Article_Title" property="Article_Title" />
+		<result column="Article_Abstract" property="Article_Abstract" />
+		<result column="Article_Content" property="Article_Content" />
+		<result column="Article_Url" property="Article_Url" />
+		<result column="Article_Type" property="Article_Type" />
+		<result column="Article_Time" property="Article_Time" />
+		<result column="Article_Author_name" property="Article_Author_name" />
+		<result column="Article_Author_logo" property="Article_Author_logo" />
+		<result column="Article_Author_desc" property="Article_Author_desc" />
+		<result column="Artilce_Comments" property="Artilce_Comments" />
+		<result column="Article_Looks" property="Article_Looks" />
+		<result column="Article_Stars" property="Article_Stars" />
+		
+		<result column="Article_Likes" property="Article_Likes" />
+		<result column="Article_IsEnable" property="Article_IsEnable" />
+				<result column="Article_Image" property="Article_Image" />
+					<result column="Article_KeyWords" property="Article_KeyWords" />
+		
+
+	 <!-- User user  -->
+  <!--       <association property="userinfo" javaType="userinfo">
+           <id column="User_Id" property="Article_Author" />外键映射
+		<result column="User_NickName" property="User_NickName" />
+		<result column="User_Password" property="User_Password" />
+		<result column="User_Type" property="User_Type" />
+		<result column="User_Sex" property="User_Sex" />
+		<result column="User_Picture" property="User_Picture" />
+		<result column="User_PhoneNum" property="User_PhoneNum" />
+		<result column="User_Email" property="User_Email" />
+		<result column="User_QQ" property="User_QQ" />
+		<result column="User_WeChat" property="User_WeChat" />
+		<result column="User_Describe" property="User_Describe" />
+		<result column="User_District" property="User_District" />
+		<result column="User_Birthday" property="User_Birthday" />
+		<result column="User_Comments" property="User_Comments" />
+		<result column="User_Historys" property="User_Historys" />
+		<result column="User_Articles" property="User_Articles" />
+		<result column="User_Videos" property="User_Videos" />
+		<result column="User_Stars" property="User_Stars" />
+		<result column="User_Notifys" property="User_Notifys" />
+		<result column="User_RegisterTime" property="User_RegisterTime" />
+		<result column="User_LastLoginTime" property="User_LastLoginTime" />
+		
+        </association> -->
+	</resultMap>
+		<!-- 模糊查询不同分类的文章列表 -->
+	<sql id="whereSelective">
+		<where>
+			<if test="queryObject.Article_Type != null and queryObject.Article_Type.trim().length>0">
+				<bind name="pattern" value="'%' + queryObject.Article_Type + '%'"/>
+				Article_Type like #{pattern}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="selectById" parameterType="article" resultMap="baseResultMap">
+	select * from Article where Article_Id=#{Article_Id}
+	</select>
+	<select id="selectByType" parameterType="page" resultMap="baseResultMap">
+		<!-- select * from (
+			select a.*,rownum rn from(
+				select * from Article <include refid="whereSelective"/>  ORDER BY  ARTICLE_ID desc
+			) a where <![CDATA[rownum<=#{lastIndex}]]>
+		)  where rn>=#{firstIndex}  -->
+	 select * from Article <include refid="whereSelective"/>  ORDER BY  ARTICLE_ID desc limit #{startRow},#{pageSize}
+	</select>
+	<select id="selectByPage" parameterType="page" resultMap="baseResultMap">
+	<!-- select * from (
+			select a.*,rownum rn from(
+				select * from Article <include refid="whereSelective"/> 
+			) a where <![CDATA[rownum<=#{lastIndex}]]>
+		)  where rn>=#{firstIndex}  -->
+		 select * from Article <include refid="whereSelective"/> ORDER BY Artilce_Comments DESC limit #{startRow},#{pageSize}
+	
+	</select>
+	
+	<select id="selectCommentCount" parameterType="string" resultType="int">
+select Artilce_Comments from Article where Article_Id=#{contentId}
+</select>
+	
+	<select id="selectAll"  resultMap="baseResultMap">
+select DISTINCT * from Article
+</select>
+<select id="articleCounts" parameterType="article" resultType="int">
+select count(*) from Article<trim prefix="where"> 	<if test="Article_Type!=null">Article_Type=#{Article_Type}</if></trim>
+</select>
+	<sql id="insert_columns">
+	<trim prefix="(" suffix=")" suffixOverrides=",">
+	Article_Id,
+	<if test="Article_Title!=null">Article_Title,</if>
+	<if test="Article_Abstract!=null">Article_Abstract,</if>
+	<if test="Article_Content!=null">Article_Content,</if>
+	<if test="Article_Url!=null">Article_Url,</if>
+	<if test="Article_Type!=null">Article_Type,</if>
+	<if test="Article_Time!=null">Article_Time,</if>
+	<if test="Article_Author_name!=null">Article_Author_name,</if>
+	<if test="Article_Author_logo!=null">Article_Author_logo,</if>
+	<if test="Article_Author_desc!=null">Article_Author_desc,</if>
+	<if test="Artilce_Comments!=null">Artilce_Comments,</if>
+	<if test="Article_Looks!=null">Article_Looks,</if>
+	<if test="Article_Stars!=null">Article_Stars,</if>
+	
+	<if test="Article_Likes!=null">Article_Likes,</if>
+	<if test="Article_IsEnable!=null">Article_IsEnable,</if>
+	<if test="Article_Image!=null">Article_Image,</if>
+	<if test="Article_KeyWords!=null">Article_KeyWords</if>
+	
+	</trim>
+	</sql>
+	<sql id="insert_values" >
+	<trim prefix="values(" suffix=")" suffixOverrides=",">
+	<!-- <choose>
+	<when test="Article_Id!=0">#{Article_Id},</when>
+	<otherwise>SEQ_ARTICLE.nextval,</otherwise>
+	</choose> -->
+		<if test="Article_Id!=null">#{Article_Id},</if>
+	
+	<if test="Article_Title!=null">#{Article_Title},</if>
+	<if test="Article_Abstract!=null">#{Article_Abstract},</if>
+	<if test="Article_Content!=null">#{Article_Content},</if>
+	<if test="Article_Url	!=null">#{Article_Url},</if>
+	<if test="Article_Type!=null">#{Article_Type},</if>
+	<if test="Article_Time!=null">#{Article_Time},</if>
+	<if test="Article_Author_name!=null">#{Article_Author_name},</if>
+	<if test="Article_Author_logo!=null">#{Article_Author_logo},</if>
+	<if test="Article_Author_desc!=null">#{Article_Author_desc},</if>
+	<if test="Artilce_Comments!=null">#{Artilce_Comments},</if>
+	<if test="Article_Looks!=null">#{Article_Looks},</if>
+	<if test="Article_Stars!=null">#{Article_Stars},</if>
+	
+	<if test="Article_Likes!=null">#{Article_Likes},</if>
+	<if test="Article_IsEnable!=null">#{Article_IsEnable},</if>
+		<if test="Article_Image!=null">#{Article_Image},</if>
+		<if test="Article_KeyWords!=null">#{Article_KeyWords}</if>
+	
+	</trim>
+	</sql>
+	<insert id="insertArticle" parameterType="article">
+	insert ignore into Article <include refid="insert_columns"/> <include refid="insert_values"/>
+	</insert>
+	
+	<update id="updateArticle" parameterType="Article">
+	update Article 
+	<trim suffixOverrides="," prefix="SET">
+	<if test="Article_Looks!=0">Article_Looks=#{Article_Looks},</if>
+	<if test="Article_Stars!=0">Article_Stars=#{Article_Stars},</if>
+	
+	<if test="Artilce_Comments!=0">Artilce_Comments=#{Artilce_Comments},</if>
+	<if test="Article_Likes!=0">Article_Likes=#{Article_Likes},</if>
+	
+	</trim>
+	where Article_Id=#{Article_Id}
+	</update>
+	
+	<delete id="deleteArticle" parameterType="article">
+	delete Article <trim prefix="where"><if test="Article_Id!=0">Article_Id=#{Article_Id}</if></trim>
+	</delete>
+	</mapper>
