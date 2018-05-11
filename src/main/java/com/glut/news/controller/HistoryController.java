@@ -1,22 +1,20 @@
 package com.glut.news.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.glut.news.commons.CommonUtil;
 import com.glut.news.service.IHistoryService;
 import com.glut.news.vo.History;
 import com.glut.news.vo.Page;
 import com.glut.news.vo.UserInfo;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/history")
@@ -41,10 +39,16 @@ public class HistoryController {
 			page2.setAverPageSize(page2.getPageSize()/2);
 			
 		}else {
-			
+			page2.setTotalRow(historyCount);
 			page2.setPageNo(page.getPageNo());
 			int startRow=CommonUtil.getStartRowBycurrentPage(page.getPageNo(), page2.pageSize);
-			page2.setStartRow(startRow);
+			if (page2.getPageNo()==1){
+				page2.setStartRow(startRow);
+
+			}else {
+				page2.setStartRow(startRow/2);
+
+			}
 		}
 		History h=new History();
 		h.setHistory_Persion(user.getUser_Id());
@@ -68,7 +72,13 @@ public class HistoryController {
 	@RequestMapping("/tatolHistory")
 	public @ResponseBody int tatolHistory(HttpSession hSession){
 		UserInfo user=(UserInfo) hSession.getAttribute("User");
-		historyCount=user.getUser_Historys();
+		if(user==null){
+			historyCount=0;
+
+		}else{
+			historyCount=user.getUser_Historys();
+
+		}
 		return historyCount;
 		
 		

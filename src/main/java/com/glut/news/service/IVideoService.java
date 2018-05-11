@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IVideoService {
 
-	int getTaltolVideoService();
+	int getTaltolVideoService(Video v);
 
 	List<Video> getVideoService(Page<Video> page2);
 
@@ -31,4 +31,6 @@ public interface IVideoService {
 	Video getVideoDetailService(Video video, HttpSession hSession);
 
 	void deleteRepeatVideoServer();
+
+	List<Video> selectAllVideoServer();
 }

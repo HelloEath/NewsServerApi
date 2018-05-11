@@ -1,25 +1,18 @@
 package com.glut.news.controller;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.collections.map.HashedMap;
+import com.glut.news.commons.CommonUtil;
+import com.glut.news.service.ICommentService;
+import com.glut.news.vo.Comments;
+import com.glut.news.vo.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.glut.news.commons.CommonUtil;
-import com.glut.news.service.ICommentService;
-import com.glut.news.service.IVideoService;
-import com.glut.news.vo.Comments;
-import com.glut.news.vo.Page;
-import com.glut.news.vo.Video;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/comment")
 @Controller
@@ -63,7 +56,6 @@ public class CommentController {
 		}else {
 			page2.setPageNo(page.getPageNo());
 			int startRow=CommonUtil.getStartRowBycurrentPage(page.getPageNo(), 10);
-
 			page2.setStartRow(startRow);
 		}
 		page2.setQueryObject(comments);
@@ -94,9 +86,8 @@ public class CommentController {
 		}
 		return map;
 	}
+
 /*更新文章/视频评论数*/
-	
-	
 	@RequestMapping("/updateComment")
 	public @ResponseBody int updateComment(String  contentId,int type){
 		int x=iCommentService.updateCommentService(contentId,type);

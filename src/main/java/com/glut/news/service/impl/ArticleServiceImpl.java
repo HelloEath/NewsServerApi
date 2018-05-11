@@ -66,7 +66,10 @@ static List<String> urls=new ArrayList<String>();
 	
 	@Override
 	public Article getDetailArticleService(Article  article2,HttpSession hSession) {
-		return mArticleMapper.selectById(article2);
+		Article article=mArticleMapper.selectById(article2);
+		article.setArticle_Looks(article.getArticle_Looks()+1);
+		mArticleMapper.updateArticle(article);
+		return article;
 	}
 	@Override
 	public List<Article> getArticleByKeyWordsSerVice(Page<Article> page) {
@@ -78,6 +81,16 @@ static List<String> urls=new ArrayList<String>();
 	public void deleteRepeatArticleServer() {
 
 		mArticleMapper.deleteRepeatArticle();
+	}
+
+	@Override
+	public List<Article> getArticleByTuiJianService(Page<Article> page) {
+		return mArticleMapper.selectByTuiJian(page);
+	}
+
+	@Override
+	public List<Article> getAllArticleService() {
+		return mArticleMapper.selectAll();
 	}
 
 

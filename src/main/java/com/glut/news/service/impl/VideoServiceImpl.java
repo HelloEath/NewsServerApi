@@ -27,9 +27,9 @@ public class VideoServiceImpl implements IVideoService {
 	UserMapper userMapper;
 
 	@Override
-	public int getTaltolVideoService() {
+	public int getTaltolVideoService(Video v) {
 		// TODO Auto-generated method stub
-		return videoMapper.videoCounts(null);
+		return videoMapper.videoCounts(v);
 	}
 
 	@Override
@@ -95,7 +95,9 @@ public class VideoServiceImpl implements IVideoService {
 		 Timer timer = new Timer();// 实例化Timer类  
 	        timer.schedule(new TimerTask() {  
 	            public void run() {  
-	                System.out.println("退出");  
+	                System.out.println("退出");
+					video2.setVideo_Players(video2.getVideo_Players() + 1);
+					videoMapper.updateVideo(video2);// 更新视频播放量
 	                if (userInfo!=null) {
 	            		History history = new History();
 	            		history.setHistory_Article(video.getVideo_Id());
@@ -114,11 +116,12 @@ public class VideoServiceImpl implements IVideoService {
 	            			if (m.containsKey(video2.getVideo_Type())) {
 	            				m.replace(video2.getVideo_Type(), m.get(video2.getVideo_Type()) + 1);// 如果浏览的文章/视频类型包含在用户已存在的兴趣点，则为该兴趣点值加一，并替换原来值
 	            			} else {
+	            				if(!"".equals(video2.getVideo_Type()))
 	            				m.put(video2.getVideo_Type(), 1.0);// 如果浏览的文章/视频类型不包含在用户已存在的兴趣点，则为用户新添加一个兴趣点，并设初始值1
 
 	            			}
 
-	            			video2.setVideo_Players(video2.getVideo_Players() + 1);
+
 	            			// TODO Auto-generated method stub
 
 	            			userInfo.setUser_Interest(gson.toJson(m).toString());// 保存新的兴趣点数据
@@ -129,11 +132,12 @@ public class VideoServiceImpl implements IVideoService {
 	            			history.setHistory_Time(com.glut.news.commons.DateUtils.formatDate_getCurrentDateByF("YYYY-MM-DD"));
 
 	            			historyMapper.insertHistory(history);// 插入新历史记录
-	            			videoMapper.updateVideo(video2);// 更新视频播放量
 	            			hSession.setAttribute("User", userInfo);//更新Session数据
 	            			userMapper.updateUser(userInfo);// 保存用户新数据到数据库
 	            		}
+
 	            		}
+
 	            }  
 	        }, 5000);// 这里百毫秒  
 	
@@ -145,5 +149,10 @@ public class VideoServiceImpl implements IVideoService {
 	@Override
 	public void deleteRepeatVideoServer() {
 		videoMapper.deleteRepeatVideo();
+	}
+
+	@Override
+	public List<Video> selectAllVideoServer() {
+		return videoMapper.selectAllVideo();
 	}
 }

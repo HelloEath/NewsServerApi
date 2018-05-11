@@ -1,23 +1,19 @@
 package com.glut.news.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
+import com.glut.news.commons.CommonUtil;
+import com.glut.news.service.IStarService;
+import com.glut.news.vo.Page;
+import com.glut.news.vo.Star;
+import com.glut.news.vo.UserInfo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.glut.news.commons.CommonUtil;
-import com.glut.news.service.IStarService;
-import com.glut.news.service.impl.StarServiceImpl;
-import com.glut.news.vo.History;
-import com.glut.news.vo.Page;
-import com.glut.news.vo.Star;
-import com.glut.news.vo.UserInfo;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/star")
@@ -43,9 +39,16 @@ public class StarController {
 
 			page2.setStartRow(startRow);
 		} else {
+			page2.setTotalRow(tatol);
+
 			page2.setPageNo(page.getPageNo());
 			int startRow = CommonUtil.getStartRowBycurrentPage(page.getPageNo(), page2.pageSize);
-			page2.setStartRow(startRow);
+			if (page2.getPageNo()==1){
+				page2.setStartRow(startRow);
+			}else {
+				page2.setStartRow(startRow/2);
+
+			}
 		}
 		Star star = new Star();
 		star.setStar_UserId(userId);
@@ -70,7 +73,13 @@ public class StarController {
 	@RequestMapping("/starCount")
 	public @ResponseBody int starCount(HttpSession hSession) {
 		UserInfo user = (UserInfo) hSession.getAttribute("User");
-		tatol=user.getUser_Stars();
+		if(user==null){
+			tatol=0;
+
+		}else {
+			tatol=user.getUser_Stars();
+
+		}
 		return tatol;
 	}
 

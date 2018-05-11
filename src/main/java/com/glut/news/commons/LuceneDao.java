@@ -1,9 +1,7 @@
 package com.glut.news.commons;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.glut.news.vo.Article;
+import com.glut.news.vo.Video;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -12,10 +10,11 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
-import com.glut.news.vo.Article;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LuceneDao {
 	 /**
@@ -24,9 +23,9 @@ public class LuceneDao {
      *
      *
      */
-    public void addIndex(Article article) throws IOException{
+    public void addIndex(Object o) throws IOException{
         IndexWriter indexWriter=LuceneUtils.getIndexWriter();
-        Document doc=ArticleUtils.articleToDocument(article);
+        Document doc=ArticleUtils.articleToDocument(o);
         indexWriter.addDocument(doc);
         indexWriter.close();
     }
@@ -88,10 +87,10 @@ public class LuceneDao {
      * @return
      * @throws Exception
      */
-    public List<Article> findIndex(String keywords,int start,int rows) throws Exception{
+    public List<Object> findIndex(String keywords,int start,int rows) throws Exception{
         IndexSearcher indexSearcher=LuceneUtils.getIndexSearcher();
         //需要根据那几个字段进行检索...
-        String   fields []={"Article_Title"};
+        String   fields []={"Article_Title,Video_Title,Article_Type"};
         //Query query=new TermQuery(new Term("Article_Title",keywords));
         //title:yi  title：抑,title:症
         //第一种类型的条件..
@@ -110,7 +109,9 @@ public class LuceneDao {
         System.out.println("总记录数==total=="+topDocs.totalHits);
         ScoreDoc scoreDocs []=topDocs.scoreDocs;
         Article article=null;
-        List<Article> articlelist=new ArrayList<Article>();
+        Video video=null;
+        List<Object> objectList=new ArrayList<Object>();
+        List<Video> videoList=new ArrayList<>();
         
         
         //scoreDocs.length  vs（比较）   start+rows  取小值
@@ -122,7 +123,20 @@ public class LuceneDao {
             int docID=scoreDocs[i].doc;
             System.out.println("编号的标识==="+docID);
             article=new Article();
+            video=new Video();
             Document document=indexSearcher.doc(docID);
+
+            if (!document.get("Video_Id").equals("0")){
+                video.setVideo_Id(Integer.parseInt(document.get("Video_Id")));
+                video.setVideo_Title(document.get("Video_Title"));
+                video.setVideo_Author_Name(document.get("Video_Author_name"));
+                video.setVideo_Type(document.get("Video_Type"));
+                video.setVideo_PutTime(document.get("Video_Time"));
+                video.setVideo_Image(document.get("Video_Image"));
+                objectList.add(video);
+            }else {
+
+
             article.setArticle_Id(Integer.parseInt(document.get("Article_Id")));
             article.setArticle_Title(document.get("Article_Title"));
             article.setArticle_Author_name(document.get("Article_Author_name"));;
@@ -130,8 +144,9 @@ public class LuceneDao {
             article.setArticle_Time(document.get("Article_Time"));;
             article.setArticle_Image(document.get("Article_Image"));;
 
-            articlelist.add(article);
-        }
-        return articlelist;
+                objectList.add(article);
+            }
+            }
+        return objectList;
     }
 }

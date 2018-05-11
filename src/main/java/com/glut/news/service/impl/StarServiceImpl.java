@@ -1,24 +1,25 @@
 package com.glut.news.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
-import org.springframework.stereotype.Service;
-
 import com.glut.news.mapper.StarMapper;
 import com.glut.news.service.IStarService;
-import com.glut.news.vo.History;
+import com.glut.news.service.IUserService;
 import com.glut.news.vo.Page;
 import com.glut.news.vo.Star;
 import com.glut.news.vo.UserInfo;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 @Service
 public class StarServiceImpl implements IStarService {
 
 	@Resource
 	StarMapper starMapper;
+
+	@Resource
+	IUserService iUserService;
 	@Override
 	public int getTatolStar(int parseInt) {
 		// TODO Auto-generated method stub
@@ -45,6 +46,7 @@ public class StarServiceImpl implements IStarService {
 		UserInfo userInfo=	(UserInfo)hSession.getAttribute("User");
 		userInfo.setUser_Stars(userInfo.getUser_Stars()+1);
 		hSession.setAttribute("User", userInfo);
+			iUserService.updateUserService(userInfo);
 			return starMapper.insertStar(star);
 		}
 		return 0;

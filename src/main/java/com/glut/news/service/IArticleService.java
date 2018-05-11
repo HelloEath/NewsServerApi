@@ -18,4 +18,8 @@ public interface IArticleService {
 	List<Article> getArticleByKeyWordsSerVice(Page<Article> page);
 
 	void deleteRepeatArticleServer();
+
+	List<Article> getArticleByTuiJianService(Page<Article> page);
+
+	List<Article> getAllArticleService();
 }

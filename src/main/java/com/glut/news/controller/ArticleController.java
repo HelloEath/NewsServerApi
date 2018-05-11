@@ -2,7 +2,9 @@ package com.glut.news.controller;
 
 import com.glut.news.commons.CommonUtil;
 import com.glut.news.service.IArticleService;
+import com.glut.news.service.ICommentService;
 import com.glut.news.service.INetBugsService;
+import com.glut.news.service.IVideoService;
 import com.glut.news.vo.Article;
 import com.glut.news.vo.Page;
 import com.glut.news.vo.UserInfo;
@@ -22,22 +24,33 @@ import java.util.Map;
 @Controller
 @RequestMapping("/article")
 public class ArticleController {
+	/*慎重打开*/
+	/*private LuceneDao luceneDao=new LuceneDao();*/
 
 	@Resource
 	IArticleService iArticleService;
 	@Resource
 	INetBugsService iNetBugsService;
-	
-	@RequestMapping("/tuijian")
-	//获取首页推荐文章
-	public @ResponseBody Map<String, Object> getArticle(Page<Article> p,HttpSession hSession,Article a){
-		UserInfo userInfo=(UserInfo)hSession.getAttribute("User");
 
+	@Resource
+	IVideoService iVideoService;
+
+	@Resource
+	ICommentService iCommentService;
+
+    List<Article> al=null;
+   //获取首页推荐文章
+	@RequestMapping("tuijian/isinterest")
+	public @ResponseBody
+	Map<String, Object> getArticle(Page<Article> p, HttpSession hSession, Article a){
+		UserInfo userInfo=(UserInfo)hSession.getAttribute("User");
+		List<Object> aList=null;
 		Page<Article> page=(Page<Article>) hSession.getAttribute("ArticlePage1");
 		if (page==null) {
 			page=new Page<Article>();
 			int totalRow=iArticleService.getTotalRowService(null);
-			
+			 aList = new ArrayList<>();
+			 al=iArticleService.getAllArticleService();
 			page.setTotalRow(totalRow);
 			page.setPageSize(10);
 			page.setPageNo(1);
@@ -61,7 +74,32 @@ public class ArticleController {
 		
 	}
 	int pageSize=page.getPageSize();
-	 List<Object> aList = new ArrayList<>();
+
+		List<Article> junshi=new ArrayList<>();
+		List<Article> keji=new ArrayList<>();
+		List<Article> yule=new ArrayList<>();
+		List<Article> lvyou=new ArrayList<>();
+		List<Article> hulinawang=new ArrayList<>();
+
+		for (int i=0;i<al.size();i++){
+
+			if ("军事".equals(al.get(i).getArticle_Type())){
+				junshi.add(al.get(i));
+			}
+
+			if ("科技".equals(al.get(i).getArticle_Type())){
+				keji.add(al.get(i));
+			}
+			if ("娱乐".equals(al.get(i).getArticle_Type())){
+				yule.add(al.get(i));
+			}
+			if ("旅游".equals(al.get(i).getArticle_Type())){
+				hulinawang.add(al.get(i));
+			}
+			if ("互联网".equals(al.get(i).getArticle_Type())){
+				lvyou.add(al.get(i));
+			}
+		}
 	for (String k: m.keySet()) {
 		if ("".equals(k) || "null".equalsIgnoreCase(k)) {
 			
@@ -78,10 +116,51 @@ public class ArticleController {
 			eachTypeCount=(int) dd;
 		}
 		if (eachTypeCount!=0) {
-			page.setPageSize(eachTypeCount);
-			a.setArticle_Type(k);
+			//*page.setPageSize(eachTypeCount);
+			/*a.setArticle_Type(k);
 			page.setQueryObject(a);
-			aList.addAll(iArticleService.getArticleService(page));
+			try {
+				List<Object> o=	luceneDao.findIndex(k,page.getStartRow(),page.pageSize);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}*/
+
+			if (k.equals("科技")){
+				for (int i=1;i<=eachTypeCount;i++){
+					aList.add(keji.get(i));
+
+
+				}
+
+			}
+			if (k.equals("娱乐")){
+
+				for (int i=1;i<=eachTypeCount;i++){
+					aList.add(yule.get(i));
+
+
+				}
+			}
+			if (k.equals("互联网")){
+				for (int i=1;i<=eachTypeCount;i++){
+
+					aList.add(hulinawang.get(i));
+
+				}
+
+			}
+			if (k.equals("旅游")){
+
+				for (int i=1;i<=eachTypeCount;i++){
+					aList.add(lvyou.get(i));
+
+				}
+
+			}
+
+
+
+
 		}
 		
 		}
@@ -102,7 +181,47 @@ public class ArticleController {
 	   return map;
 		
 	}
-	
+
+
+
+
+
+	/*分类文章获取*/
+	@RequestMapping("/tuijian/nointerest")
+	public @ResponseBody Map<String, Object> getTuiJianArticle(HttpSession hSession,Page<Article> p){
+		Page<Article> page=(Page<Article>) hSession.getAttribute("tuijianpage");
+		if (page==null) {
+			page=new Page<Article>();
+			int total=iArticleService.getTotalRowService(null);
+			int startRow=CommonUtil.getStartRowBycurrentPage(page.getPageNo(), 10);
+			page.setStartRow(startRow);
+			page.setTotalRow(total);
+			page.setPageSize(10);
+			page.setPageNo(1);
+		}else {
+			page.setPageNo(p.getPageNo());
+			int startRow=CommonUtil.getStartRowBycurrentPage(page.getPageNo(), 10);
+			page.setStartRow(startRow);
+		}
+		List<Article> aList=iArticleService.getArticleByTuiJianService(page);
+
+		hSession.setAttribute("tuijianpage", page);
+		Map<String, Object> map=new HashMap<String, Object>();
+		boolean isHaveNextPage=page.getNext();
+		if (aList.size()!=0) {
+			map.put("stus", "ok");
+			map.put("data", aList);
+			map.put("nextpage", page.getNextNo());
+			map.put("isHaveNextPage", isHaveNextPage);
+		}else {
+			map.put("stus", "error");
+		}
+
+
+		return map;
+	}
+
+
 	@RequestMapping("/putArticle")
 	public void putArticle(){
 		
@@ -117,8 +236,10 @@ public class ArticleController {
 				iNetBugsService.bugsZakerWeb();
 				iNetBugsService.bugsFirstNewsWeb();
 				iNetBugsService.bugsTouTiaoWeb();
+				//数据库去重
 				iArticleService.deleteRepeatArticleServer();
-
+				iVideoService.deleteRepeatVideoServer();
+				//iCommentService.deleteRepeatCommentServer();
 				Long endTime=System.currentTimeMillis();
 				System.out.println("爬取结束时间："+endTime);
 			     float excTime=(float)(endTime-starTime)/1000;
@@ -141,7 +262,7 @@ public class ArticleController {
 		return x;
 	}
 	
-	/*分类文章获取*/
+	//分类文章获取
 	@RequestMapping("/typeArticle")
 	public @ResponseBody Map<String, Object> typeArticle(Article article,HttpSession hSession,Page<Article> p){
 		Page<Article> page=(Page<Article>) hSession.getAttribute(article.getArticle_Type()+"page");
@@ -160,10 +281,7 @@ public class ArticleController {
 		}
 		page.setQueryObject(article);
 		List<Article> aList=iArticleService.getArticleByTypeService(page);
-		for (int i = 0; i < aList.size(); i++) {
-			aList.get(i).setArticle_Abstract("");
-			aList.get(i).setArticle_Content("");
-		}
+
 	hSession.setAttribute(article.getArticle_Type()+"page", page);
 	 Map<String, Object> map=new HashMap<String, Object>();
 	 boolean isHaveNextPage=page.getNext();
@@ -182,11 +300,11 @@ public class ArticleController {
 	
 	/*获取文章详情页*/
 	@RequestMapping("/detailArticle")
-	public String  detailArticle(Article article,ModelMap model,HttpSession hSession){
-		article =iArticleService.getDetailArticleService(article,hSession);
+	public String  detailArticle(Article article, ModelMap model, HttpSession hSession){
+	    article =iArticleService.getDetailArticleService(article,hSession);
 		article.setArticle_Content(article.getArticle_Content().replace("lazy", "img-fluid"));;
 		model.addAttribute("Article", article);
-		return "forward:/views/articleDetail.jsp";
+		return "forward:/articleDetail";
 	}
 
 }

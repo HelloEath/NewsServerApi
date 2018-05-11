@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- mybatis和spring整合，完成：
+1.自动扫描
+2.数据源配置
+3.事务管理
+ -->
+<beans xmlns="http://www.springframework.org/schema/beans"    
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"    
+    xmlns:p="http://www.springframework.org/schema/p"    
+    xmlns:context="http://www.springframework.org/schema/context"   
+    xmlns:tx="http://www.springframework.org/schema/tx" 
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:util="http://www.springframework.org/schema/util"    
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd    
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd   
+            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd   
+            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd   
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd"> 
+  
+  <!-- 自动扫描与装配bean，扫描web包，将带有注解的类纳入spring容器管理 -->  
+    <!-- <context:component-scan base-package="cn.itcast.oa">作用  
+    Spring容器初始化时，会扫描cn.itcast.oa目录下标有@Component；@Service；@Controller；@Repository  
+    注解的类纳入Spring容器管理  
+    在类上，使用以下注解，实现bean的声明：  
+      @Component：泛指组件，当组件不好归类的时候，我们可以使用这个注解进行标注。  
+      @Service 用于标注业务层组件  
+      @Controller 用于标注控制层组件（如springMvc的controller，struts中的action）  
+      @Repository用于标注数据访问组件，即DAO组件  
+              
+    在类的成员变量上，使用以下注解，实现属性的自动装配  
+      @Autowired ：按类的类型进行装配  
+      @Resource：  
+  1.如果同时指定了name和type，那么从Spring上下文中找到唯一匹配的bean进行装配  
+  2. 如果指定了name，则从上下文中查找名称（id）匹配的bean进行装配，找不到则抛出异常   
+  3.如果指定了type，则从上下文中找到类型匹配的唯一bean进行装配，找不到或者找到多个，都会抛出异常   
+  4.如果既没有指定name，又没有指定type，则自动按照byName方式进行装配；如果没有匹配，则回退为一个原始类型进行匹配，如果匹配则自动装配；  
+     -->  
+     
+     <context:component-scan base-package="com.glut.news.service" />
+     <!--开启注解处理器--> 
+     <context:annotation-config/>     
+    
+
+      <!-- 加载外部的properties配置文件（引入jdbc的配置文件） -->
+     <context:property-placeholder location="classpath:database.properties" />
+     
+     	<!-- 声明一个数据源 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" 
+		init-method="init" destroy-method="close">
+		<!-- 基本属性 url、user、password -->
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<!-- <property name="driverClassName" value="${jdbc.driver}"></property> -->
+		<!-- 配置初始化大小、最小、最大 -->
+		<property name="initialSize" value="1" />
+		<property name="minIdle" value="1" />
+		<property name="maxActive" value="20" />
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="60000" />
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 'x' FROM DUAL" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
+		<!-- 配置监控统计拦截的filters -->
+		<property name="filters" value="stat,log4j" />
+	</bean>
+     
+     
+     <!-- 声明mybatis SqlSessionFactory （把数据源注入给session工厂）、配置映射文件将Spring与mybatis初步整合起来-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+        <!-- myBatis配置文件，因为mybatis有些配置无法在此完成 -->
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--
+		可以在Configuration.xml或此处配置映射文件，但其中不能有相同id的parameterMap, resultMap或sql等 
+        <property name="mapperLocations" value="classpath*:mapper/*.xml" />  
+		 -->
+        <property name="typeAliasesPackage" value="com.glut.news.vo" />  
+	</bean>
+	
+	<!-- Scan Mapper Files扫描接口映射器 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 接口映射器的基础包 -->
+		<property name="basePackage" value="com.glut.news.mapper" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+	</bean>
+	
+	<!--================事务相关控制===================-->
+	<!-- 声明事务管理器 -->
+	<bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<!-- 声明事务的切入点，即在什么样的方法上切事务所 
+		propagation="REQUIRED"事务的传播行为
+		read-only="false"是否为只读事务，在只读事务的上下中只能查询不能执行CUD操作
+		rollback-for="java.lang.Exception"当事务遇到什么类型的异常时事务将回滚
+	-->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="insert*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+			<tx:method name="save*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+			<tx:method name="add*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+			<tx:method name="delete*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+			<tx:method name="update*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception" />
+			<tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+			<tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+			<tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
+			<tx:method name="*" propagation="SUPPORTS" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- AOP事务 -->
+	<aop:config>
+		<!--把事务控制在Service层-->
+		<aop:pointcut id="txPointcut" expression="execution(public * com.glut.news.service..*.*(..))" /> 
+		<aop:advisor pointcut-ref="txPointcut" advice-ref="txAdvice" />
+	</aop:config>
+	
+   </beans>

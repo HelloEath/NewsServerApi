@@ -1,23 +1,18 @@
 package com.glut.news.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
+import com.glut.news.commons.CommonUtil;
+import com.glut.news.service.ISearchService;
+import com.glut.news.vo.Article;
+import com.glut.news.vo.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.glut.news.commons.CommonUtil;
-import com.glut.news.service.ISearchService;
-import com.glut.news.service.impl.VideoServiceImpl;
-import com.glut.news.vo.Article;
-import com.glut.news.vo.Page;
-import com.glut.news.vo.Search;
-import com.google.gson.Gson;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/search")
@@ -28,7 +23,7 @@ public class SearchController {
 	
 	@RequestMapping("/searchData")
 	public @ResponseBody Map<String, Object> searchData(Page<Article> page,Article article,HttpSession hSession){
-		Page<Article> page2=(Page<Article>)hSession.getAttribute("SearchPage");
+		Page<Article> page2=(Page<Article>)hSession.getAttribute("SearchPage"+article.getArticle_Type());
 		if (page2==null) {
 			page2=new Page<Article>();
 			page2.setQueryObject(article);
@@ -53,7 +48,7 @@ public class SearchController {
 			map.put("stus", "ok");
 			map.put("nextpage", page2.getNextNo());
 			map.put("isHaveNextPage", page2.getNext());
-			hSession.setAttribute("SearchPage", page2);
+			hSession.setAttribute("SearchPage"+article.getArticle_Type(), page2);
 		}else {
 			map.put("stus", "error");
 

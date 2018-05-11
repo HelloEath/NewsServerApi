@@ -1,9 +1,9 @@
 package com.glut.news.mapper;
 
-import java.util.List;
-
 import com.glut.news.vo.Article;
 import com.glut.news.vo.Page;
+
+import java.util.List;
 
 public interface ArticleMapper {
 
@@ -18,4 +18,6 @@ public interface ArticleMapper {
 	List<Article> selectByKeyWords(Page<Article> page);
 	List<Article> selectAll();
 	void deleteRepeatArticle();
+
+    List<Article> selectByTuiJian(Page<Article> page);
 }

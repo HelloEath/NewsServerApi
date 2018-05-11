@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+ <!-- 名字空间,mybatis高版本后namespace属性是必须的，其作用用来区分每个SQL映射文件中的语句, 也就说在一个项目里可能会在不同的SQL 
+	映射文件中存在相同的语句ID
+	
+	column不做限制，可以为任意表的字段，而property须为type 定义的pojo属性
+<resultMap id="唯一的标识" type="映射的pojo对象">
+  <id column="表的主键字段，或者可以为查询语句中的别名字段" jdbcType="字段类型" property="映射pojo对象的主键属性" />
+  <result column="表的一个字段（可以为任意表的一个字段）" jdbcType="字段类型" property="映射到pojo对象的一个属性（须为type定义的pojo对象中的一个属性）"/>
+  <association property="pojo的一个对象属性" javaType="pojo关联的pojo对象">
+    <id column="关联pojo对象对应表的主键字段" jdbcType="字段类型" property="关联pojo对象的主席属性"/>
+    <result  column="任意表的字段" jdbcType="字段类型" property="关联pojo对象的属性"/>
+  </association>
+  集合中的property须为oftype定义的pojo对象的属性
+  <collection property="pojo的集合属性" ofType="集合中的pojo对象">
+    <id column="集合中pojo对象对应的表的主键字段" jdbcType="字段类型" property="集合中pojo对象的主键属性" />
+    <result column="可以为任意表的字段" jdbcType="字段类型" property="集合中的pojo对象的属性" />  
+  </collection>
+</resultMap>
+
+	 -->
+	
+	<mapper namespace="com.glut.news.mapper.CommentsMapper">
+	<resultMap type="comments" id="baseResultMap" >
+		<id column="Comment_Id" property="Comment_Id" />
+		<result column="Comment_Content" property="Comment_Content" />
+		<result column="Comment_Author" property="Comment_Author" />
+		<result column="Comment_Time" property="Comment_Time" />
+		<result column="Comment_Article" property="Comment_Article" />
+		<result column="Author_name" property="Author_name" />
+		<result column="Author_logo" property="Author_logo" />
+		<result column="Comment_Likes" property="Comment_Likes" />
+		
+	</resultMap>
+	<!-- 查询对应文章的评论信息 -->
+	<sql id="whereSelective">
+		<where>
+			<if test="queryObject.Comment_Article != null ">
+				
+				Comment_Article = #{queryObject.Comment_Article}
+			</if>
+		</where>
+	</sql>
+	<select id="selectByPage" parameterType="page" resultMap="baseResultMap">
+<!-- 	select * from (
+			select a.*,rownum rn from(
+				select * from Comments<include refid="whereSelective"></include> ORDER BY Comment_Likes DESC
+			) a where <![CDATA[rownum<=#{lastIndex}]]>
+		)  where rn>=#{firstIndex}  -->
+	 select * from Comments <include refid="whereSelective"/> limit #{startRow},#{pageSize}
+	</select>
+	
+<select id="commentCounts" parameterType="comments" resultType="int">
+select count(Comment_Id) from Comments where Comment_Article=#{Comment_Article}
+</select>
+	<sql id="insert_columns">
+	<trim prefix="(" suffix=")" suffixOverrides=",">
+	Comment_Id,
+	<if test="Comment_Content!=null">Comment_Content,</if>
+	<if test="Comment_Author!=null">Comment_Author,</if>
+	<if test="Comment_Time!=null">Comment_Time,</if>
+	<if test="Comment_Article!=null">Comment_Article,</if>
+	<if test="Author_name!=null">Author_name,</if>
+	<if test="Author_logo!=null">Author_logo,</if>
+	<if test="Comment_Likes!=null">Comment_Likes</if>
+	
+	</trim>
+	</sql>
+	<sql id="insert_values" >
+	<trim prefix="values(" suffix=")" suffixOverrides=",">
+	<!-- <choose>
+	<when test="Comment_Id!=0">#{Comment_Id},</when>
+	<otherwise>SEQ_COMMENT.nextval,</otherwise>
+	</choose> -->
+	<if test="Comment_Id!=null">#{Comment_Id},</if>
+	<if test="Comment_Content!=null">#{Comment_Content},</if>
+	<if test="Comment_Author!=null">#{Comment_Author},</if>
+	<if test="Comment_Time!=null">#{Comment_Time},</if>
+	<if test="Comment_Article!=null">#{Comment_Article},</if>
+	<if test="Author_name!=null">#{Author_name},</if>
+	<if test="Author_logo!=null">#{Author_logo},</if>
+	<if test="Comment_Likes!=null">#{Comment_Likes}</if>
+	
+	</trim>
+	</sql>
+	<insert id="insertComment" parameterType="comments">
+	insert ignore into Comments <include refid="insert_columns"/> <include refid="insert_values"/>
+	</insert>
+	
+	<update id="updateComment" parameterType="comments">
+	update Comments 
+	<trim suffixOverrides="," prefix="SET">
+	<if test="User_NickName!=null">User_NickName=#{User_NickName},</if>
+	<if test="User_Password!=null">User_Password=#{User_Password},</if>
+	
+	<if test="User_Sex!=null">User_Sex=#{User_Sex},</if>
+	<if test="User_Picture!=null">User_Picture=#{User_Picture},</if>
+	<if test="User_PhoneNum!=null">User_PhoneNum=#{User_PhoneNum},</if>
+	
+	<if test="User_Email!=null">User_Email=#{User_Email},</if>
+	<if test="User_QQ!=null">User_QQ=#{User_QQ},</if>
+	<if test="User_WeChat!=null">User_WeChat=#{User_WeChat},</if>
+	<if test="User_Describe!=null">User_Describe=#{User_Describe},</if>
+	<if test="User_District!=null">User_District=#{User_District},</if>
+	<if test="User_Birthday!=null">User_Birthday=#{User_Birthday}</if>
+
+	
+	
+	</trim>
+	where Article_Id=#{Article_Id}
+	</update>
+	
+	<delete id="deleteRepeatComment" >
+	delete Comments where
+ Comment_Id=#{Comment_Id} and Comment_Author=#{Comment_Author}
+	</delete>
+	</mapper>

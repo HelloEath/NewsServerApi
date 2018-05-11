@@ -42,7 +42,7 @@ public class TimerController {
 				//数据库去重
 				articleService.deleteRepeatArticleServer();
 				iVideoService.deleteRepeatVideoServer();
-				iCommentService.deleteRepeatCommentServer();
+				//iCommentService.deleteRepeatCommentServer();
 				Long endTime=System.currentTimeMillis();
 				System.out.println("爬取结束时间："+endTime);
 			     float excTime=(float)(endTime-starTime)/1000;
