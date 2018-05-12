@@ -61,6 +61,13 @@ public class HistoryServiceImpl implements IHistoryService {
 		}else {
 			String sidString=hSession.getId();
 			UserInfo userInfo=(UserInfo)hSession.getAttribute("User");
+			/*Article article=new Article();
+			article.setArticle_Id(history.getHistory_Article());
+			 article=mArticleMapper.selectById(article);
+			article.setArticle_Looks(article.getArticle_Looks()+1);
+			// TODO Auto-generated method stub
+			mArticleMapper.updateArticle(article);// 更新阅览量
+*/			if (userInfo!=null) {
 			userInfo.setUser_Historys(userInfo.getUser_Historys()+1);
 			
 			Gson gson= new Gson();
@@ -73,15 +80,9 @@ public class HistoryServiceImpl implements IHistoryService {
 				m.put(history.getContent_type(), 1.0);//如果浏览的文章/视频类型不包含在用户已存在的兴趣点，则为用户新添加一个兴趣点，并设初始值1
 			
 			}
-			if (history.getHistory_Type()==1) {//是文章
+			/*if (history.getHistory_Type()==1) {//是文章
 				   if (userInfo!=null) {
 	            		
-	            			Article article=new Article();
-	            			article.setArticle_Id(history.getHistory_Article());
-	            			 article=mArticleMapper.selectById(article);
-	            			article.setArticle_Looks(article.getArticle_Looks()+1);
-	            			// TODO Auto-generated method stub
-	            			mArticleMapper.updateArticle(article);// 更新阅览量
 	            		}
 			}else {//是视频
 				Video rVideo=new Video();
@@ -91,12 +92,12 @@ public class HistoryServiceImpl implements IHistoryService {
 				// TODO Auto-generated method stub
 				 videoMapper.updateVideo(rVideo);//更新视频播放量
 			}
-			
+			*/
 			userInfo.setUser_Interest(gson.toJson(m).toString());//保存新的兴趣点数据
 			hSession.setAttribute("User", userInfo);
 			userMapper.updateUser(userInfo);
 			return historyMapper.insertHistory(history);
-
+			}
 		}
 		
 		return x;

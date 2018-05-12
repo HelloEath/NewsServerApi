@@ -300,11 +300,11 @@ public class ArticleController {
 	
 	/*获取文章详情页*/
 	@RequestMapping("/detailArticle")
-	public String  detailArticle(Article article, ModelMap model, HttpSession hSession){
+	public  String  detailArticle(Article article, ModelMap model, HttpSession hSession){
 	    article =iArticleService.getDetailArticleService(article,hSession);
-		article.setArticle_Content(article.getArticle_Content().replace("lazy", "img-fluid"));;
+		article.setArticle_Content(article.getArticle_Content().replace("lazy", "img-fluid"));
 		model.addAttribute("Article", article);
-		return "forward:/articleDetail";
+		return "forward:/views/articleDetail.jsp";
 	}
 
 }
